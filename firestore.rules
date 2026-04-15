@@ -1,0 +1,117 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users/{userId}/workoutLogs
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required, immutable, must match auth.uid)
+    //   - date: string (required)
+    //   - type: string (required)
+    //   - duration: string (required)
+    //   - pullUpProgress: string (optional)
+    //   - focusLevel: number (required, 1-5)
+    //   - notes: string (optional)
+    //   - exercises: list (optional)
+    //   - createdAt: timestamp (required, immutable)
+    //
+    // Collection: users/{userId}/goals
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required, immutable, must match auth.uid)
+    //   - title: string (required)
+    //   - target: number (required)
+    //   - current: number (required)
+    //   - unit: string (required)
+    //   - createdAt: timestamp (required, immutable)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+    
+    function uidUnchanged() {
+      return !('userId' in request.resource.data) || request.resource.data.userId == request.auth.uid;
+    }
+    
+    function uidNotModified() {
+      return !('userId' in request.resource.data) || request.resource.data.userId == resource.data.userId;
+    }
+    
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function areImmutableFieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+    
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    
+    function isValidWorkoutLog() {
+      let data = request.resource.data;
+      return hasRequiredFields(['userId', 'date', 'type', 'duration', 'focusLevel', 'createdAt']) &&
+             data.userId is string && data.userId.size() > 0 && data.userId.size() < 100 &&
+             data.date is string && data.date.size() > 0 && data.date.size() < 50 &&
+             data.type is string && data.type.size() > 0 && data.type.size() < 100 &&
+             data.duration is string && data.duration.size() > 0 && data.duration.size() < 50 &&
+             data.focusLevel is number && data.focusLevel >= 1 && data.focusLevel <= 5 &&
+             data.createdAt is timestamp &&
+             (!('pullUpProgress' in data) || (data.pullUpProgress is string && data.pullUpProgress.size() < 1000)) &&
+             (!('notes' in data) || (data.notes is string && data.notes.size() < 5000)) &&
+             (!('exercises' in data) || (data.exercises is list && data.exercises.size() < 100));
+    }
+    
+    function isValidGoal() {
+      let data = request.resource.data;
+      return hasRequiredFields(['userId', 'title', 'target', 'current', 'unit', 'createdAt']) &&
+             data.userId is string && data.userId.size() > 0 && data.userId.size() < 100 &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             data.target is number &&
+             data.current is number &&
+             data.unit is string && data.unit.size() > 0 && data.unit.size() < 50 &&
+             data.createdAt is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      // Allow users to read/write their own subcollections
+      match /workoutLogs/{logId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidWorkoutLog() && uidUnchanged();
+        allow update: if isOwner(userId) && isValidWorkoutLog() && uidNotModified() && areImmutableFieldsUnchanged(['createdAt']);
+        allow delete: if isOwner(userId);
+      }
+      
+      match /goals/{goalId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidGoal() && uidUnchanged();
+        allow update: if isOwner(userId) && isValidGoal() && uidNotModified() && areImmutableFieldsUnchanged(['createdAt']);
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

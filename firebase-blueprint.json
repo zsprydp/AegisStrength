@@ -1,0 +1,64 @@
+{
+  "entities": {
+    "WorkoutLog": {
+      "title": "WorkoutLog",
+      "description": "A logged workout session.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The UID of the user who owns this log." },
+        "date": { "type": "string", "format": "date", "description": "The date of the workout." },
+        "type": { "type": "string", "description": "The type of workout (e.g., Push, Pull, Legs)." },
+        "duration": { "type": "string", "description": "Duration in minutes." },
+        "pullUpProgress": { "type": "string", "description": "Notes on pull-up progress." },
+        "focusLevel": { "type": "number", "description": "Focus level from 1 to 5." },
+        "notes": { "type": "string", "description": "Additional notes." },
+        "exercises": {
+          "type": "array",
+          "description": "List of exercises performed.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "sets": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "reps": { "type": "string" },
+                    "weight": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "createdAt": { "type": "timestamp", "description": "When the log was created." }
+      },
+      "required": ["userId", "date", "type", "duration", "focusLevel", "createdAt"]
+    },
+    "Goal": {
+      "title": "Goal",
+      "description": "A user's fitness goal.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The UID of the user who owns this goal." },
+        "title": { "type": "string", "description": "The title of the goal." },
+        "target": { "type": "number", "description": "The target value." },
+        "current": { "type": "number", "description": "The current progress value." },
+        "unit": { "type": "string", "description": "The unit of measurement." },
+        "createdAt": { "type": "timestamp", "description": "When the goal was created." }
+      },
+      "required": ["userId", "title", "target", "current", "unit", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/workoutLogs/{logId}": {
+      "schema": { "$ref": "#/entities/WorkoutLog" },
+      "description": "Workout logs for a specific user."
+    },
+    "/users/{userId}/goals/{goalId}": {
+      "schema": { "$ref": "#/entities/Goal" },
+      "description": "Fitness goals for a specific user."
+    }
+  }
+}
