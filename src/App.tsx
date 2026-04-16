@@ -16,8 +16,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Progress } from "@/components/ui/progress";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import { Dumbbell, Calendar as CalendarIcon, Clock, Activity, FileText, CheckCircle2, History, Target, Info, Plus, Trash2, TrendingUp, LogIn, LogOut } from "lucide-react";
+import { Dumbbell, Calendar as CalendarIcon, Clock, Activity, FileText, CheckCircle2, History, Target, Info, Plus, Trash2, TrendingUp, LogIn, LogOut, Flame } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import TodayTab from './TodayTab';
+import PlanTab from './PlanTab';
 
 // --- Types ---
 interface ExerciseSet {
@@ -289,13 +291,20 @@ export default function App() {
           </div>
         </header>
 
-        <Tabs defaultValue="log" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8 h-12 bg-zinc-200/50 p-1 rounded-xl">
+        <Tabs defaultValue="today" className="w-full">
+          <TabsList className="grid w-full grid-cols-5 mb-8 h-12 bg-zinc-200/50 p-1 rounded-xl">
+            <TabsTrigger value="today" className="rounded-lg font-medium gap-1.5">
+              <Flame className="w-3.5 h-3.5" /> Today
+            </TabsTrigger>
             <TabsTrigger value="log" className="rounded-lg font-medium">Log</TabsTrigger>
             <TabsTrigger value="progress" className="rounded-lg font-medium">Progress</TabsTrigger>
             <TabsTrigger value="goals" className="rounded-lg font-medium">Goals</TabsTrigger>
             <TabsTrigger value="plan" className="rounded-lg font-medium">Plan</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="today" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <TodayTab userId={userId} />
+          </TabsContent>
 
           {/* LOG WORKOUT TAB */}
           <TabsContent value="log" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -679,133 +688,8 @@ export default function App() {
             </Card>
           </TabsContent>
 
-          {/* PLAN TAB */}
           <TabsContent value="plan" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <Card className="border-zinc-200 shadow-sm rounded-2xl">
-              <CardHeader className="bg-zinc-900 text-white rounded-t-2xl">
-                <CardTitle className="text-xl flex items-center gap-2 font-display">
-                  <Info className="w-5 h-5 text-zinc-400" />
-                  90-Day Strength Plan
-                </CardTitle>
-                <CardDescription className="text-zinc-400">
-                  Maintain 78.7 lbs of Muscle Mass, drop 20 lbs of fat, and achieve 1 unassisted pull-up by Day 90.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                <ScrollArea className="h-[65vh]">
-                  <div className="p-6 space-y-6">
-                    
-                    <section className="space-y-2">
-                      <h3 className="font-bold text-lg text-zinc-900 border-b border-zinc-200 pb-2 font-display">Overview</h3>
-                      <ul className="space-y-1 text-sm text-zinc-700 list-disc pl-5">
-                        <li><strong>Schedule:</strong> 2-3 Times per Week (60-75 mins total per session).</li>
-                        <li><strong>Constraint Focus:</strong> Gout-safe (Low impact), Joint-friendly, Time-efficient.</li>
-                      </ul>
-                    </section>
-
-                    <section className="space-y-2">
-                      <h3 className="font-bold text-lg text-zinc-900 border-b border-zinc-200 pb-2 font-display">The "Warm-Up" (30 Mins)</h3>
-                      <div className="text-sm text-zinc-700 space-y-2">
-                        <p><strong>The Treadmill "Incline" Method:</strong> Set incline to 8%–12% and walk at 3.0–3.5 mph.</p>
-                        <p><strong>The Habit Stack:</strong> Audiobooks or YouTube only while moving.</p>
-                        <p><strong>Pull-Up Prep:</strong> During the last 5 mins, do arm circles and shoulder shrugs to prime the lats.</p>
-                      </div>
-                    </section>
-
-                    <section className="space-y-2">
-                      <h3 className="font-bold text-lg text-zinc-900 border-b border-zinc-200 pb-2 font-display">The 90-Day Pull-Up Roadmap</h3>
-                      <p className="text-sm text-zinc-500 italic mb-2">Perform these at the start of every "Workout B" (Pull Day).</p>
-                      <div className="space-y-3 text-sm text-zinc-700">
-                        <div className="bg-zinc-50 p-3 rounded-lg border border-zinc-200">
-                          <strong className="text-zinc-900">Phase 1 (Days 1-30):</strong> Use the Assisted Machine. Reduce assistance by 5 lbs every week. Target: 45 lbs assistance by Day 30.
-                        </div>
-                        <div className="bg-zinc-50 p-3 rounded-lg border border-zinc-200">
-                          <strong className="text-zinc-900">Phase 2 (Days 31-60):</strong> Introduce "Slow Negatives." Jump to the top of the bar and lower yourself as slowly as possible (aim for 5-10 seconds). Do 3 sets of 3.
-                        </div>
-                        <div className="bg-zinc-50 p-3 rounded-lg border border-zinc-200">
-                          <strong className="text-zinc-900">Phase 3 (Days 61-90):</strong> "Scapular Pulls" and "Dead Hangs." Hang from the bar for 30 seconds to build grip strength. At Day 75, attempt your first unassisted rep.
-                        </div>
-                      </div>
-                    </section>
-
-                    <section className="space-y-4">
-                      <h3 className="font-bold text-lg text-zinc-900 border-b border-zinc-200 pb-2 font-display">The Lifting & Core Split (45 Mins)</h3>
-                      
-                      <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value="item-1" className="border-zinc-200">
-                          <AccordionTrigger className="hover:no-underline hover:text-zinc-600 font-semibold">
-                            Workout A: Push Day
-                          </AccordionTrigger>
-                          <AccordionContent className="text-zinc-600 space-y-2">
-                            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">Chest, Shoulders, Triceps + Core</p>
-                            <ul className="list-disc pl-5 space-y-1">
-                              <li><strong>Dumbbell Bench Press:</strong> 3 sets of 8–10 reps.</li>
-                              <li><strong>Seated Shoulder Press (Machine):</strong> 3 sets of 10–12 reps.</li>
-                              <li><strong>Cable Tricep Pushdowns:</strong> 3 sets of 15 reps.</li>
-                              <li><strong>Incline Dumbbell Flyes:</strong> 2 sets of 12 reps.</li>
-                              <li><strong>Core - Captain’s Chair Leg Raises:</strong> 3 sets of 12–15 reps. (Keep back flat against the pad).</li>
-                              <li><strong>Core - Plank:</strong> 3 sets, hold for 45–60 seconds.</li>
-                            </ul>
-                          </AccordionContent>
-                        </AccordionItem>
-                        
-                        <AccordionItem value="item-2" className="border-zinc-200">
-                          <AccordionTrigger className="hover:no-underline hover:text-zinc-600 font-semibold">
-                            Workout B: Pull Day
-                          </AccordionTrigger>
-                          <AccordionContent className="text-zinc-600 space-y-2">
-                            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">Back, Biceps + Core</p>
-                            <ul className="list-disc pl-5 space-y-1">
-                              <li><strong>The Pull-Up Protocol:</strong> Assisted Machine OR Negatives as per the Roadmap.</li>
-                              <li><strong>Lat Pulldowns:</strong> 3 sets of 10 reps. (Use a grip similar to your pull-up).</li>
-                              <li><strong>Seated Cable Rows:</strong> 3 sets of 10–12 reps.</li>
-                              <li><strong>Dumbbell Bicep Curls:</strong> 3 sets of 12 reps.</li>
-                              <li><strong>Core - Cable Crunches:</strong> 3 sets of 15–20 reps. (Kneeling, using the rope attachment).</li>
-                              <li><strong>Core - Bird-Dog:</strong> 3 sets of 10 reps per side (Great for stabilizing the spine).</li>
-                            </ul>
-                          </AccordionContent>
-                        </AccordionItem>
-                        
-                        <AccordionItem value="item-3" className="border-zinc-200">
-                          <AccordionTrigger className="hover:no-underline hover:text-zinc-600 font-semibold">
-                            Workout C: Leg Day
-                          </AccordionTrigger>
-                          <AccordionContent className="text-zinc-600 space-y-2">
-                            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">Quads, Hamstrings + Core</p>
-                            <ul className="list-disc pl-5 space-y-1">
-                              <li><strong>Leg Press:</strong> 3 sets of 10–12 reps.</li>
-                              <li><strong>Seated Leg Curls:</strong> 3 sets of 12–15 reps.</li>
-                              <li><strong>Leg Extensions:</strong> 3 sets of 12–15 reps.</li>
-                              <li><strong>Dumbbell Goblet Squat:</strong> 2 sets of 10 reps.</li>
-                              <li><strong>Core - Russian Twists:</strong> 3 sets of 20 reps (Use a light dumbbell or kettlebell).</li>
-                              <li><strong>Core - Dead Bug:</strong> 3 sets of 12 reps (Focus on keeping your lower back pressed into the floor).</li>
-                            </ul>
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
-                    </section>
-
-                    <section className="space-y-2">
-                      <h3 className="font-bold text-lg text-zinc-900 border-b border-zinc-200 pb-2 font-display">Pro-Tips for the Pull-Up Goal</h3>
-                      <ul className="space-y-2 text-sm text-zinc-700">
-                        <li><strong>Grip Strength:</strong> Gout can sometimes affect the hands/wrists. If you feel a flare-up, use the "V-Bar" attachment for pull-ups instead of a wide straight bar to take pressure off the wrists.</li>
-                        <li><strong>The "Hollow Body" Position:</strong> When doing pull-ups or negatives, squeeze your abs and glutes. This keeps your body from swinging and makes the lift 20% easier.</li>
-                        <li><strong>Consistency:</strong> Don't skip the "Negatives" in Phase 2. That eccentric (lowering) strength is what actually builds the muscle for the pull-up.</li>
-                      </ul>
-                    </section>
-
-                    <section className="space-y-2">
-                      <h3 className="font-bold text-lg text-zinc-900 border-b border-zinc-200 pb-2 font-display">Home-Based "Active Recovery"</h3>
-                      <ul className="space-y-1 text-sm text-zinc-700 list-disc pl-5">
-                        <li><strong>Kettlebell Swings:</strong> 3 sets of 15.</li>
-                        <li><strong>Gravel Bike / Hiking:</strong> Low-impact steady-state cardio.</li>
-                      </ul>
-                    </section>
-
-                  </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
+            <PlanTab />
           </TabsContent>
         </Tabs>
       </div>
